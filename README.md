@@ -24,7 +24,7 @@ In this Workspace, you'll find a data set containing real messages that were sen
 3. Go to http://0.0.0.0:3001/
 
 ## Project Components
-There are three components you'll need to complete for this project.
+There are three components for this project.
 
 ### ETL Pipeline
 In a Python script, process_data.py, write a data cleaning pipeline that:
