@@ -3,8 +3,7 @@
 ## Table of contents
 * [Motivation](#Motivation)
 * [Instructions](#Instructions)
-* [Results](#Results)
-* [Tools](#Tools)
+* [Project Components](#Project_Components)
 * [Technologies](#technologies)
 * [Contact](#Contact)
 
@@ -45,7 +44,7 @@ In a Python script, train_classifier.py, write a machine learning pipeline that:
 * Outputs results on the test set
 * Exports the final model as a pickle file
 
-###. Flask Web App
+### Flask Web App
 Data visualizations using Plotly in the web app. 
 
 ## Technologies
