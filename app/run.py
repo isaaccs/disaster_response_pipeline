@@ -1,15 +1,19 @@
 import json
 import plotly
 import pandas as pd
+import numpy as np
 
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
 from flask import Flask
 from flask import render_template, request, jsonify
-from plotly.graph_objs import Bar
-import joblib
+
+from plotly.graph_objs import Bar, Pie
 from sqlalchemy import create_engine
+
+import joblib
+
 from sklearn.base import BaseEstimator,TransformerMixin
 
 class LengthTransformer(BaseEstimator, TransformerMixin):
@@ -52,9 +56,48 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
+    original_counts = [df.original.notnull().sum(), df.original.isnull().sum()]
+    original_names = ['Translated', 'Not Translated']
+    
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
+        # extract data needed for visuals
+    lengths = df.message.str.split().str.len()
+    length_counts, length_division = np.histogram(lengths,
+                                              range=(0, lengths.quantile(0.99)))
+
+    # create visuals
     graphs = [
+        {
+            'data': [
+                Bar(
+                    x=length_division,
+                    y=length_counts
+                    )
+            ],
+
+            'layout': {
+                'title': 'Message Length Distribution',
+                },
+            'yaxis': {
+                'title': "Count"
+            },
+            'xaxis': {
+                'title': "Message Length"
+            }
+        },
+        {
+            'data': [
+                Pie(
+                    labels=original_names,
+                    values=original_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Percentage of Translated Messages',
+            }
+        },
         {
             'data': [
                 Bar(
@@ -74,11 +117,11 @@ def index():
             }
         }
     ]
-    
+
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
-    
+
     # render web page with plotly graphs
     return render_template('master.html', ids=ids, graphJSON=graphJSON)
 
@@ -87,13 +130,13 @@ def index():
 @app.route('/go')
 def go():
     # save user input in query
-    query = request.args.get('query', '') 
+    query = request.args.get('query', '')
 
     # use model to predict classification for query
     classification_labels = model.predict([query])[0]
     classification_results = dict(zip(df.columns[4:], classification_labels))
 
-    # This will render the go.html Please see that file. 
+    # This will render the go.html Please see that file.
     return render_template(
         'go.html',
         query=query,

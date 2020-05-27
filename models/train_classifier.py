@@ -80,7 +80,7 @@ def build_model():
     Args:
         None
     Returns:
-        pipeline (scikit-learn Pipeline): Pipeline model object
+        gridsearch (scikit-learn gridsearch): gridsearch model object
     """
     forest_clf = RandomForestClassifier(n_estimators=10)
         
@@ -97,8 +97,19 @@ def build_model():
 
     ('MultiOutput', MultiOutputClassifier(forest_clf))
     ])
+    param_grid = {
+        'features__text_pipeline__tfidf__ngram_range': ((1, 1), (1, 2)),
+        'features__text_pipeline__tfidf__max_df': [0.8, 1.0],
+        'MultiOutput__estimator__n_estimators': [10, 20],
+        'MultiOutput__estimator__max_depth': [ 4,6]
+       
+    }
+
+    cv = GridSearchCV(pipeline, param_grid, cv=3, verbose=1, n_jobs=-1)
+
+    return cv
     
-    return pipeline
+
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
